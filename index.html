@@ -137,11 +137,19 @@ let inSession = false;
 
 // ===== CONECTAR MQTT =====
 function connectMQTT() {
-    client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
+    setStatus(false, 'Conectando...');
+    
+    client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', {
+        keepalive: 60,
+        clean: true,
+        connectTimeout: 10000,
+        reconnectPeriod: 3000,
+        clientId: 'web_' + myId
+    });
     
     client.on('connect', function() {
         connected = true;
-        setStatus(true, 'Conectado');
+        setStatus(true, 'Conectado ao ESP32');
         client.subscribe(TOPIC_STATUS);
         client.subscribe(TOPIC_SESSION);
     });
@@ -164,14 +172,18 @@ function connectMQTT() {
         }
     });
 
+    client.on('reconnect', function() {
+        setStatus(false, 'Reconectando...');
+    });
+
     client.on('offline', function() {
         connected = false;
         setStatus(false, 'Sem conexão');
     });
 
-    client.on('error', function() {
+    client.on('error', function(err) {
         connected = false;
-        setStatus(false, 'Erro de conexão');
+        setStatus(false, 'Erro: ' + err.message);
     });
 }
 
