@@ -139,7 +139,7 @@ let inSession = false;
 function connectMQTT() {
     setStatus(false, 'Conectando...');
     
-    client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', {
+    client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
         keepalive: 60,
         clean: true,
         connectTimeout: 10000,
