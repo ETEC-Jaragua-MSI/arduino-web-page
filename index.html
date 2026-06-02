@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Solar Control - Feira de Ciências</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;padding:1rem;display:flex;justify-content:center}
+.c{max-width:500px;width:100%}
+h1{text-align:center;font-size:1.5rem;margin-bottom:.3rem}
+.sub{text-align:center;color:#94a3b8;font-size:.85rem;margin-bottom:1.5rem}
+
+.status-bar{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem;border-radius:10px;margin-bottom:1.5rem;font-size:.85rem;font-weight:600;background:rgba(239,68,68,.1);color:#ef4444}
+.status-bar.ok{background:rgba(16,185,129,.1);color:#10b981}
+.status-bar .dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+
+.timer{text-align:center;background:#1e293b;border-radius:14px;padding:1rem;margin-bottom:1.5rem;border:1px solid #334155;display:none}
+.timer .time{font-size:2.2rem;font-weight:800;color:#f59e0b}
+.timer .label{font-size:.75rem;color:#94a3b8;margin-top:.2rem}
+
+.section{font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:.7rem;margin-top:.5rem}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-bottom:1.2rem}
+.led{background:#1e293b;border-radius:14px;padding:1.3rem .5rem;text-align:center;border:2px solid #334155;cursor:pointer;transition:all .3s;user-select:none;-webkit-tap-highlight-color:transparent}
+.led:active{transform:scale(.93)}
+.led.on{border-color:#f59e0b;box-shadow:0 0 20px rgba(245,158,11,.15);background:linear-gradient(180deg,rgba(245,158,11,.08),#1e293b)}
+.led .icon{font-size:2.2rem;filter:grayscale(1) opacity(.3);transition:.3s}
+.led.on .icon{filter:none}
+.led .name{font-weight:700;margin-top:.4rem;font-size:.85rem}
+.led .pin{font-size:.65rem;color:#64748b;margin-top:.15rem}
+
+.rele{background:#1e293b;border-radius:14px;padding:1.3rem;text-align:center;border:2px solid #334155;cursor:pointer;transition:all .3s;margin-bottom:1.2rem;user-select:none;-webkit-tap-highlight-color:transparent}
+.rele:active{transform:scale(.97)}
+.rele.on{border-color:#ef4444;box-shadow:0 0 25px rgba(239,68,68,.15);background:linear-gradient(180deg,rgba(239,68,68,.06),#1e293b)}
+.rele .icon{font-size:2.8rem;filter:grayscale(1) opacity(.3);transition:.3s}
+.rele.on .icon{filter:none}
+.rele .name{font-weight:700;font-size:1rem;margin-top:.4rem}
+.rele .desc{font-size:.7rem;color:#94a3b8;margin-top:.2rem}
+
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
+.btn{padding:.85rem;border-radius:12px;border:none;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s}
+.btn:active{transform:scale(.96)}
+.btn-on{background:#f59e0b;color:#000}
+.btn-off{background:#334155;color:#f1f5f9}
+
+.wait{text-align:center;padding:2rem 1rem;display:none}
+.wait h2{margin-bottom:.8rem;font-size:1.3rem}
+.wait p{color:#94a3b8;line-height:1.6}
+
+.start-screen{text-align:center;padding:2rem 0}
+.start-screen .btn-start{display:inline-block;padding:1.1rem 2.5rem;border-radius:14px;border:none;background:#f59e0b;color:#000;font-weight:700;font-size:1.1rem;cursor:pointer}
+.start-screen p{color:#94a3b8;margin-bottom:1.5rem;line-height:1.6}
+.start-screen .features{margin-top:1.5rem;text-align:left;display:inline-block;font-size:.85rem;color:#94a3b8;line-height:2}
+</style>
+</head>
+<body>
+<div class="c">
+<h1>☀️ Solar Control</h1>
+<p class="sub">Feira de Ciências - Energia Solar</p>
+
+<div class="status-bar" id="statusBar">
+<span class="dot"></span>
+<span id="statusText">Conectando...</span>
+</div>
+
+<!-- Tela inicial -->
+<div id="startScreen" class="start-screen">
+<p>Controle luzes em tempo real!<br>Você terá <strong>1 minuto</strong> para testar.</p>
+<button class="btn-start" onclick="startSession()">▶️ Começar Demonstração</button>
+<div class="features">
+<div>💡 3 LEDs de demonstração</div>
+<div>🔌 1 Lâmpada real com relé</div>
+<div>⏱️ 1 minuto por pessoa</div>
+</div>
+</div>
+
+<!-- Tela de espera -->
+<div id="waitScreen" class="wait">
+<h2>⏳ Aguarde sua vez</h2>
+<p>Alguém está usando agora.<br>Você será redirecionado automaticamente.</p>
+</div>
+
+<!-- Tela de controle -->
+<div id="controlScreen" style="display:none">
+<div class="timer" id="timerBox">
+<div class="time" id="countdown">60</div>
+<div class="label">segundos restantes</div>
+</div>
+
+<div class="section">💡 LEDs</div>
+<div class="grid">
+<div class="led" id="l1" onclick="toggle('LED1')"><div class="icon">💡</div><div class="name">Sala</div><div class="pin">LED 1</div></div>
+<div class="led" id="l2" onclick="toggle('LED2')"><div class="icon">💡</div><div class="name">Cozinha</div><div class="pin">LED 2</div></div>
+<div class="led" id="l3" onclick="toggle('LED3')"><div class="icon">💡</div><div class="name">Quarto</div><div class="pin">LED 3</div></div>
+</div>
+
+<div class="section">🔌 Lâmpada Real</div>
+<div class="rele" id="releCard" onclick="toggle('RELE')">
+<div class="icon">💡</div>
+<div class="name">Lâmpada</div>
+<div class="desc">Toque para ligar/desligar</div>
+</div>
+
+<div class="btns">
+<button class="btn btn-on" onclick="sendCmd('ALLON')">🔆 Ligar Tudo</button>
+<button class="btn btn-off" onclick="sendCmd('ALLOFF')">Desligar Tudo</button>
+</div>
+</div>
+
+<!-- Tela expirada -->
+<div id="expiredScreen" style="display:none;text-align:center;padding:2rem">
+<h2>⏰ Tempo esgotado!</h2>
+<p style="color:#94a3b8;margin-top:1rem;line-height:1.6">Sua sessão de 1 minuto terminou.<br>Obrigado por participar!</p>
+</div>
+
+</div>
+
+<!-- MQTT via WebSocket (biblioteca pública) -->
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script>
+// ===== CONFIG =====
+const TOPIC_CMD = 'feira_solar_2026/cmd';
+const TOPIC_STATUS = 'feira_solar_2026/status';
+const TOPIC_SESSION = 'feira_solar_2026/session';
+const SESSION_TIME = 60; // segundos
+
+// ===== STATE =====
+let client = null;
+let connected = false;
+let states = { led1: false, led2: false, led3: false, rele: false };
+let sessionOwner = null;
+let myId = 'user_' + Math.random().toString(36).substr(2, 8);
+let countdown = SESSION_TIME;
+let timerInterval = null;
+let inSession = false;
+
+// ===== CONECTAR MQTT =====
+function connectMQTT() {
+    client = mqtt.connect('wss://broker.hivemq.com:8884/mqtt');
+    
+    client.on('connect', function() {
+        connected = true;
+        setStatus(true, 'Conectado');
+        client.subscribe(TOPIC_STATUS);
+        client.subscribe(TOPIC_SESSION);
+    });
+
+    client.on('message', function(topic, message) {
+        const msg = message.toString();
+        
+        if (topic === TOPIC_STATUS) {
+            try {
+                states = JSON.parse(msg);
+                updateUI();
+            } catch(e) {}
+        }
+        
+        if (topic === TOPIC_SESSION) {
+            try {
+                const data = JSON.parse(msg);
+                handleSessionMsg(data);
+            } catch(e) {}
+        }
+    });
+
+    client.on('offline', function() {
+        connected = false;
+        setStatus(false, 'Sem conexão');
+    });
+
+    client.on('error', function() {
+        connected = false;
+        setStatus(false, 'Erro de conexão');
+    });
+}
+
+// ===== SESSÃO =====
+function startSession() {
+    if (!connected) { alert('Aguarde a conexão...'); return; }
+    
+    // Verificar se alguém está usando
+    if (sessionOwner && sessionOwner !== myId) {
+        showScreen('wait');
+        // Esperar e tentar de novo
+        setTimeout(startSession, 3000);
+        return;
+    }
+    
+    // Iniciar minha sessão
+    sessionOwner = myId;
+    inSession = true;
+    countdown = SESSION_TIME;
+    
+    client.publish(TOPIC_SESSION, JSON.stringify({ owner: myId, action: 'start' }));
+    
+    showScreen('control');
+    document.getElementById('timerBox').style.display = 'block';
+    
+    // Timer
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(function() {
+        countdown--;
+        document.getElementById('countdown').textContent = countdown;
+        if (countdown <= 0) {
+            endSession();
+        }
+    }, 1000);
+}
+
+function endSession() {
+    inSession = false;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    
+    // Desligar tudo
+    sendCmd('ALLOFF');
+    
+    // Avisar que sessão acabou
+    client.publish(TOPIC_SESSION, JSON.stringify({ owner: myId, action: 'end' }));
+    sessionOwner = null;
+    
+    showScreen('expired');
+}
+
+function handleSessionMsg(data) {
+    if (data.action === 'start' && data.owner !== myId) {
+        sessionOwner = data.owner;
+        if (!inSession) showScreen('wait');
+    }
+    if (data.action === 'end') {
+        sessionOwner = null;
+        if (!inSession) showScreen('start');
+    }
+}
+
+// ===== COMANDOS =====
+function toggle(device) {
+    if (!inSession) return;
+    const key = device.toLowerCase();
+    // Mapear corretamente
+    let stateKey = key;
+    if (key === 'led1') stateKey = 'led1';
+    if (key === 'led2') stateKey = 'led2';
+    if (key === 'led3') stateKey = 'led3';
+    if (key === 'rele') stateKey = 'rele';
+    
+    const isOn = states[stateKey];
+    const cmd = device + (isOn ? 'OFF' : 'ON');
+    sendCmd(cmd);
+}
+
+function sendCmd(cmd) {
+    if (!connected) return;
+    client.publish(TOPIC_CMD, cmd);
+}
+
+// ===== UI =====
+function updateUI() {
+    document.getElementById('l1').classList.toggle('on', states.led1);
+    document.getElementById('l2').classList.toggle('on', states.led2);
+    document.getElementById('l3').classList.toggle('on', states.led3);
+    document.getElementById('releCard').classList.toggle('on', states.rele);
+}
+
+function showScreen(name) {
+    document.getElementById('startScreen').style.display = name === 'start' ? 'block' : 'none';
+    document.getElementById('waitScreen').style.display = name === 'wait' ? 'block' : 'none';
+    document.getElementById('controlScreen').style.display = name === 'control' ? 'block' : 'none';
+    document.getElementById('expiredScreen').style.display = name === 'expired' ? 'block' : 'none';
+}
+
+function setStatus(ok, text) {
+    const bar = document.getElementById('statusBar');
+    bar.classList.toggle('ok', ok);
+    document.getElementById('statusText').textContent = text;
+}
+
+// ===== INICIAR =====
+connectMQTT();
+</script>
+</body>
+</html>
