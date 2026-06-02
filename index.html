@@ -176,7 +176,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#080d1a;color:#f1f5f
 <div class="start-features">
 <div>💡 3 LEDs</div>
 <div>🔌 Lâmpada real</div>
-<div>⏱️ 60 segundos</div>
+<div>⏱️ 2 minutos</div>
 <div>📊 Gasto simulado</div>
 </div>
 </div>
@@ -199,7 +199,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#080d1a;color:#f1f5f
 <div class="timer-display">
 <div class="timer-ring-wrap">
 <svg width="80" height="80"><circle class="bg" cx="40" cy="40" r="35"/><circle class="prog" id="timerRing" cx="40" cy="40" r="35" stroke-dasharray="219.9" stroke-dashoffset="0"/></svg>
-<span class="time-big" id="countdown">60</span>
+<span class="time-big" id="countdown">120</span>
 </div>
 <div class="label">segundos restantes</div>
 </div>
@@ -292,7 +292,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#080d1a;color:#f1f5f
 <div class="exp-content">
 <span class="icon">⏰</span>
 <h2>Tempo Esgotado!</h2>
-<p>Sua demonstração de 1 minuto terminou.<br>Obrigado por participar!<br><br>🌱 Energia solar é o futuro!</p>
+<p>Sua demonstração de 2 minutos terminou.<br>Obrigado por participar!<br><br>🌱 Energia solar é o futuro!</p>
 </div>
 </div>
 
@@ -302,8 +302,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#080d1a;color:#f1f5f
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
 // ===== CONFIG =====
-const TOPIC_CMD='feira_solar_2026/cmd',TOPIC_STATUS='feira_solar_2026/status',TOPIC_SESSION='feira_solar_2026/session';
-const SESSION_TIME=60,VALID_TOKEN='feira2026';
+const TOPIC_CMD='feira_solar_2026/cmd',TOPIC_STATUS='feira_solar_2026/status',TOPIC_SESSION='feira_solar_2026/session',TOPIC_LOG='feira_solar_2026/log';
+const SESSION_TIME=120,VALID_TOKEN='feira2026';
 const params=new URLSearchParams(window.location.search);
 const hasAccess=(params.get('t')===VALID_TOKEN);
 
@@ -311,6 +311,7 @@ let client=null,connected=false;
 let states={led1:false,led2:false,led3:false,rele:false};
 let sessionOwner=null,myId='u_'+Math.random().toString(36).substr(2,6);
 let countdown=SESSION_TIME,timerInterval=null,inSession=false;
+let cooldownUntil=0; // anti-spam: tempo que precisa esperar
 
 // Energy simulation
 let simSolar=0,simConsumo=0,simEconomia=0,simKwh=0;
@@ -332,9 +333,17 @@ client.on('error',()=>{connected=false;setStatus(false,'Erro');});
 // ===== SESSION =====
 function startSession(){
 if(!connected){alert('Aguarde a conexão...');return;}
+// Anti-spam: cooldown de 3 minutos
+const now=Date.now();
+if(cooldownUntil>now){
+const wait=Math.ceil((cooldownUntil-now)/1000);
+alert('Aguarde '+wait+' segundos antes de usar novamente.');
+return;
+}
 if(sessionOwner&&sessionOwner!==myId){show('wait');setTimeout(startSession,3000);return;}
 sessionOwner=myId;inSession=true;countdown=SESSION_TIME;
 client.publish(TOPIC_SESSION,JSON.stringify({owner:myId,action:'start'}));
+logAction('SESSION_START');
 show('control');
 if(timerInterval)clearInterval(timerInterval);
 timerInterval=setInterval(()=>{
@@ -350,8 +359,10 @@ function endSession(){
 inSession=false;
 if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
 sendCmd('ALLOFF');
+logAction('SESSION_END');
 client.publish(TOPIC_SESSION,JSON.stringify({owner:myId,action:'end'}));
 sessionOwner=null;show('expired');
+cooldownUntil=Date.now()+180000; // 3 minutos de cooldown
 }
 function handleSession(d){
 if(d.action==='start'&&d.owner!==myId){sessionOwner=d.owner;if(!inSession)show('wait');}
@@ -360,7 +371,7 @@ if(d.action==='end'){sessionOwner=null;if(!inSession)show('start');}
 
 // ===== COMMANDS =====
 function toggle(dev){if(!inSession)return;const k=dev.toLowerCase();sendCmd(dev+(states[k]?'OFF':'ON'));}
-function sendCmd(cmd){if(!connected)return;client.publish(TOPIC_CMD,cmd);}
+function sendCmd(cmd){if(!connected)return;client.publish(TOPIC_CMD,cmd);logAction(cmd);}
 
 // ===== UI =====
 function updateUI(){
@@ -421,6 +432,7 @@ c.appendChild(bar);
 function runRoutine(el,name){
 if(!inSession)return;
 el.classList.add('running');
+logAction('ROUTINE:'+name);
 const badge=document.createElement('div');
 badge.className='badge';
 badge.textContent='Executando...';
@@ -432,6 +444,13 @@ else if(name==='Boa noite'){sendCmd('ALLOFF');setTimeout(()=>sendCmd('LED3ON'),8
 else if(name==='Economia'){sendCmd('ALLOFF');}
 
 setTimeout(()=>{badge.textContent='✓ Feito';badge.style.color='#10b981';},2000);
+}
+
+// ===== LOG =====
+function logAction(action){
+if(!client||!connected)return;
+const log={user:myId,action:action,time:new Date().toLocaleString('pt-BR'),ts:Date.now()};
+client.publish(TOPIC_LOG,JSON.stringify(log));
 }
 </script>
 </body>
