@@ -6,100 +6,161 @@
 <title>Solar Control - Feira de Ciências</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,sans-serif;background:#0f172a;color:#f1f5f9;min-height:100vh;padding:1rem;display:flex;justify-content:center}
-.c{max-width:500px;width:100%}
-h1{text-align:center;font-size:1.5rem;margin-bottom:.3rem}
-.sub{text-align:center;color:#94a3b8;font-size:.85rem;margin-bottom:1.5rem}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#0c1222 0%,#1a1a3e 50%,#0f172a 100%);color:#f1f5f9;min-height:100vh;padding:1rem;display:flex;justify-content:center;align-items:flex-start}
+.c{max-width:480px;width:100%;padding-top:.5rem}
 
-.status-bar{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem;border-radius:10px;margin-bottom:1.5rem;font-size:.85rem;font-weight:600;background:rgba(239,68,68,.1);color:#ef4444}
-.status-bar.ok{background:rgba(16,185,129,.1);color:#10b981}
-.status-bar .dot{width:8px;height:8px;border-radius:50%;background:currentColor;animation:p 2s infinite}
-@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+/* Header */
+.header{text-align:center;margin-bottom:1.5rem}
+.header .logo{font-size:3rem;margin-bottom:.3rem;display:block}
+.header h1{font-size:1.6rem;font-weight:800;background:linear-gradient(90deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header .sub{color:#64748b;font-size:.8rem;margin-top:.3rem;letter-spacing:.5px}
 
-.timer{text-align:center;background:#1e293b;border-radius:14px;padding:1rem;margin-bottom:1.5rem;border:1px solid #334155;display:none}
-.timer .time{font-size:2.2rem;font-weight:800;color:#f59e0b}
-.timer .label{font-size:.75rem;color:#94a3b8;margin-top:.2rem}
+/* Status */
+.status-bar{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.6rem 1rem;border-radius:50px;margin:0 auto 1.5rem;font-size:.8rem;font-weight:600;width:fit-content;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
+.status-bar.ok{background:rgba(16,185,129,.1);color:#10b981;border-color:rgba(16,185,129,.2)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:p 2s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.2}}
 
-.section{font-size:.8rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:.7rem;margin-top:.5rem}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin-bottom:1.2rem}
-.led{background:#1e293b;border-radius:14px;padding:1.3rem .5rem;text-align:center;border:2px solid #334155;cursor:pointer;transition:all .3s;user-select:none;-webkit-tap-highlight-color:transparent}
-.led:active{transform:scale(.93)}
-.led.on{border-color:#f59e0b;box-shadow:0 0 20px rgba(245,158,11,.15);background:linear-gradient(180deg,rgba(245,158,11,.08),#1e293b)}
-.led .icon{font-size:2.2rem;filter:grayscale(1) opacity(.3);transition:.3s}
-.led.on .icon{filter:none}
-.led .name{font-weight:700;margin-top:.4rem;font-size:.85rem}
-.led .pin{font-size:.65rem;color:#64748b;margin-top:.15rem}
+/* Cards */
+.card{background:rgba(30,41,59,.7);backdrop-filter:blur(10px);border-radius:20px;padding:1.5rem;margin-bottom:1.2rem;border:1px solid rgba(51,65,85,.5)}
 
-.rele{background:#1e293b;border-radius:14px;padding:1.3rem;text-align:center;border:2px solid #334155;cursor:pointer;transition:all .3s;margin-bottom:1.2rem;user-select:none;-webkit-tap-highlight-color:transparent}
+/* Timer */
+.timer{text-align:center;padding:1.2rem}
+.timer .ring{width:90px;height:90px;margin:0 auto .8rem;position:relative;display:flex;align-items:center;justify-content:center}
+.timer .ring svg{position:absolute;transform:rotate(-90deg)}
+.timer .ring circle{fill:none;stroke-width:4}
+.timer .ring .bg{stroke:#1e293b}
+.timer .ring .progress{stroke:#f59e0b;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.timer .time{font-size:1.8rem;font-weight:800;color:#f59e0b}
+.timer .label{font-size:.75rem;color:#64748b;margin-top:.3rem}
+
+/* LED Grid */
+.section-title{font-size:.75rem;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.8rem;font-weight:600}
+.led-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin-bottom:1.2rem}
+.led{background:rgba(15,23,42,.6);border-radius:16px;padding:1.2rem .5rem;text-align:center;border:2px solid rgba(51,65,85,.5);cursor:pointer;transition:all .3s;user-select:none;-webkit-tap-highlight-color:transparent}
+.led:active{transform:scale(.92)}
+.led.on{border-color:#f59e0b;box-shadow:0 0 25px rgba(245,158,11,.12),inset 0 0 20px rgba(245,158,11,.05);background:rgba(245,158,11,.06)}
+.led .icon{font-size:2rem;filter:grayscale(1) opacity(.25);transition:.3s}
+.led.on .icon{filter:none;text-shadow:0 0 15px rgba(245,158,11,.5)}
+.led .name{font-weight:700;margin-top:.4rem;font-size:.8rem}
+.led .sub-text{font-size:.65rem;color:#475569;margin-top:.1rem}
+
+/* Rele */
+.rele{background:rgba(15,23,42,.6);border-radius:16px;padding:1.3rem;text-align:center;border:2px solid rgba(51,65,85,.5);cursor:pointer;transition:all .3s;user-select:none;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:1rem}
 .rele:active{transform:scale(.97)}
-.rele.on{border-color:#ef4444;box-shadow:0 0 25px rgba(239,68,68,.15);background:linear-gradient(180deg,rgba(239,68,68,.06),#1e293b)}
-.rele .icon{font-size:2.8rem;filter:grayscale(1) opacity(.3);transition:.3s}
+.rele.on{border-color:#ef4444;box-shadow:0 0 25px rgba(239,68,68,.1);background:rgba(239,68,68,.04)}
+.rele .icon{font-size:2.5rem;filter:grayscale(1) opacity(.25);transition:.3s}
 .rele.on .icon{filter:none}
-.rele .name{font-weight:700;font-size:1rem;margin-top:.4rem}
-.rele .desc{font-size:.7rem;color:#94a3b8;margin-top:.2rem}
+.rele-info{text-align:left}
+.rele .name{font-weight:700;font-size:1rem}
+.rele .desc{font-size:.7rem;color:#64748b;margin-top:.15rem}
+.rele-status{margin-left:auto;font-size:.7rem;padding:.3rem .7rem;border-radius:50px;background:rgba(51,65,85,.5);color:#64748b;font-weight:600}
+.rele.on .rele-status{background:rgba(239,68,68,.15);color:#ef4444}
 
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-bottom:1rem}
-.btn{padding:.85rem;border-radius:12px;border:none;font-size:.9rem;font-weight:700;cursor:pointer;transition:.2s}
-.btn:active{transform:scale(.96)}
-.btn-on{background:#f59e0b;color:#000}
-.btn-off{background:#334155;color:#f1f5f9}
+/* Buttons */
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.btn{padding:.8rem;border-radius:12px;border:none;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s}
+.btn:active{transform:scale(.95)}
+.btn-on{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;box-shadow:0 4px 15px rgba(245,158,11,.2)}
+.btn-off{background:rgba(51,65,85,.5);color:#94a3b8}
 
-.wait{text-align:center;padding:2rem 1rem;display:none}
-.wait h2{margin-bottom:.8rem;font-size:1.3rem}
-.wait p{color:#94a3b8;line-height:1.6}
+/* Start Screen */
+.start-screen{text-align:center;padding:1.5rem 0}
+.start-screen .hero-icon{font-size:4rem;margin-bottom:1rem;display:block}
+.start-screen p{color:#94a3b8;margin-bottom:1.5rem;line-height:1.7;font-size:.9rem}
+.start-screen .btn-start{display:inline-block;padding:1rem 2.5rem;border-radius:14px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:800;font-size:1.1rem;cursor:pointer;box-shadow:0 5px 20px rgba(245,158,11,.3);transition:all .2s}
+.start-screen .btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(245,158,11,.4)}
+.start-screen .btn-start:active{transform:scale(.96)}
+.features{margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem .8rem;text-align:left}
+.features div{font-size:.8rem;color:#64748b;padding:.4rem 0}
+.features span{margin-right:.4rem}
 
-.start-screen{text-align:center;padding:2rem 0}
-.start-screen .btn-start{display:inline-block;padding:1.1rem 2.5rem;border-radius:14px;border:none;background:#f59e0b;color:#000;font-weight:700;font-size:1.1rem;cursor:pointer}
-.start-screen p{color:#94a3b8;margin-bottom:1.5rem;line-height:1.6}
-.start-screen .features{margin-top:1.5rem;text-align:left;display:inline-block;font-size:.85rem;color:#94a3b8;line-height:2}
+/* Wait Screen */
+.wait{text-align:center;padding:2.5rem 1rem}
+.wait h2{font-size:1.4rem;margin-bottom:.8rem}
+.wait p{color:#94a3b8;line-height:1.6;font-size:.9rem}
+.wait .spinner{width:40px;height:40px;border:3px solid #1e293b;border-top-color:#f59e0b;border-radius:50%;animation:spin 1s linear infinite;margin:1.5rem auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Expired */
+.expired{text-align:center;padding:2.5rem 1rem}
+.expired .icon{font-size:3.5rem;margin-bottom:1rem;display:block}
+.expired h2{font-size:1.4rem;margin-bottom:.8rem}
+.expired p{color:#94a3b8;line-height:1.7;font-size:.9rem}
+
+/* Denied */
+.denied{text-align:center;padding:2.5rem 1rem}
+.denied .icon{font-size:3.5rem;margin-bottom:1rem;display:block}
+.denied h2{font-size:1.3rem;margin-bottom:.8rem;color:#ef4444}
+.denied p{color:#94a3b8;line-height:1.7;font-size:.9rem}
+
+/* Footer */
+.footer{text-align:center;padding:1rem 0;font-size:.7rem;color:#334155}
 </style>
 </head>
 <body>
 <div class="c">
-<h1>☀️ Solar Control</h1>
-<p class="sub">Feira de Ciências - Energia Solar</p>
+
+<div class="header">
+<span class="logo">☀️</span>
+<h1>Solar Control</h1>
+<div class="sub">FEIRA DE CIÊNCIAS • ENERGIA SOLAR</div>
+</div>
 
 <div class="status-bar" id="statusBar">
 <span class="dot"></span>
 <span id="statusText">Conectando...</span>
 </div>
 
-<!-- Tela inicial -->
-<div id="startScreen" class="start-screen">
-<p>Controle luzes em tempo real!<br>Você terá <strong>1 minuto</strong> para testar.</p>
+<!-- Acesso negado (sem token) -->
+<div id="deniedScreen" class="denied" style="display:none">
+<span class="icon">🔒</span>
+<h2>Acesso Restrito</h2>
+<p>Para usar a demonstração, escaneie o QR Code disponível no stand da feira.</p>
+</div>
+
+<!-- Tela inicial (com token válido) -->
+<div id="startScreen" class="start-screen" style="display:none">
+<span class="hero-icon">⚡</span>
+<p>Controle luzes reais em tempo real!<br>Você terá <strong>1 minuto</strong> para testar.</p>
 <button class="btn-start" onclick="startSession()">▶️ Começar Demonstração</button>
 <div class="features">
-<div>💡 3 LEDs de demonstração</div>
-<div>🔌 1 Lâmpada real com relé</div>
-<div>⏱️ 1 minuto por pessoa</div>
+<div><span>💡</span> 3 LEDs</div>
+<div><span>🔌</span> Lâmpada real</div>
+<div><span>⏱️</span> 60 segundos</div>
+<div><span>📱</span> Tempo real</div>
 </div>
 </div>
 
-<!-- Tela de espera -->
-<div id="waitScreen" class="wait">
+<!-- Espera -->
+<div id="waitScreen" class="wait" style="display:none">
 <h2>⏳ Aguarde sua vez</h2>
-<p>Alguém está usando agora.<br>Você será redirecionado automaticamente.</p>
+<p>Alguém está usando agora.<br>Você entrará automaticamente.</p>
+<div class="spinner"></div>
 </div>
 
-<!-- Tela de controle -->
+<!-- Controle -->
 <div id="controlScreen" style="display:none">
-<div class="timer" id="timerBox">
-<div class="time" id="countdown">60</div>
+<div class="card timer" id="timerBox">
+<div class="ring">
+<svg width="90" height="90"><circle class="bg" cx="45" cy="45" r="40"/><circle class="progress" id="timerRing" cx="45" cy="45" r="40" stroke-dasharray="251.2" stroke-dashoffset="0"/></svg>
+<span class="time" id="countdown">60</span>
+</div>
 <div class="label">segundos restantes</div>
 </div>
 
-<div class="section">💡 LEDs</div>
-<div class="grid">
-<div class="led" id="l1" onclick="toggle('LED1')"><div class="icon">💡</div><div class="name">Sala</div><div class="pin">LED 1</div></div>
-<div class="led" id="l2" onclick="toggle('LED2')"><div class="icon">💡</div><div class="name">Cozinha</div><div class="pin">LED 2</div></div>
-<div class="led" id="l3" onclick="toggle('LED3')"><div class="icon">💡</div><div class="name">Quarto</div><div class="pin">LED 3</div></div>
+<div class="section-title">💡 LEDs de Demonstração</div>
+<div class="led-grid">
+<div class="led" id="l1" onclick="toggle('LED1')"><div class="icon">💡</div><div class="name">Sala</div><div class="sub-text">GPIO 4</div></div>
+<div class="led" id="l2" onclick="toggle('LED2')"><div class="icon">💡</div><div class="name">Cozinha</div><div class="sub-text">GPIO 5</div></div>
+<div class="led" id="l3" onclick="toggle('LED3')"><div class="icon">💡</div><div class="name">Quarto</div><div class="sub-text">GPIO 21</div></div>
 </div>
 
-<div class="section">🔌 Lâmpada Real</div>
+<div class="section-title">🔌 Lâmpada Real (Relé)</div>
 <div class="rele" id="releCard" onclick="toggle('RELE')">
 <div class="icon">💡</div>
-<div class="name">Lâmpada</div>
-<div class="desc">Toque para ligar/desligar</div>
+<div class="rele-info"><div class="name">Lâmpada</div><div class="desc">Controle real via relé</div></div>
+<div class="rele-status" id="releStatus">OFF</div>
 </div>
 
 <div class="btns">
@@ -108,22 +169,29 @@ h1{text-align:center;font-size:1.5rem;margin-bottom:.3rem}
 </div>
 </div>
 
-<!-- Tela expirada -->
-<div id="expiredScreen" style="display:none;text-align:center;padding:2rem">
-<h2>⏰ Tempo esgotado!</h2>
-<p style="color:#94a3b8;margin-top:1rem;line-height:1.6">Sua sessão de 1 minuto terminou.<br>Obrigado por participar!</p>
+<!-- Expirado -->
+<div id="expiredScreen" style="display:none" class="expired">
+<span class="icon">⏰</span>
+<h2>Tempo esgotado!</h2>
+<p>Sua sessão de 1 minuto terminou.<br>Obrigado por participar da demonstração!<br><br>🌱 Energia solar é o futuro!</p>
 </div>
 
+<div class="footer">Projeto Feira de Ciências 2026 • ESP32 + MQTT</div>
 </div>
 
-<!-- MQTT via WebSocket (biblioteca pública) -->
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
 // ===== CONFIG =====
 const TOPIC_CMD = 'feira_solar_2026/cmd';
 const TOPIC_STATUS = 'feira_solar_2026/status';
 const TOPIC_SESSION = 'feira_solar_2026/session';
-const SESSION_TIME = 60; // segundos
+const SESSION_TIME = 60;
+const VALID_TOKEN = 'feira2026';  // Token secreto no QR code
+
+// ===== VERIFICAR TOKEN =====
+const params = new URLSearchParams(window.location.search);
+const token = params.get('t');
+const hasAccess = (token === VALID_TOKEN);
 
 // ===== STATE =====
 let client = null;
@@ -135,10 +203,17 @@ let countdown = SESSION_TIME;
 let timerInterval = null;
 let inSession = false;
 
-// ===== CONECTAR MQTT =====
+// ===== INIT =====
+if (!hasAccess) {
+    document.getElementById('deniedScreen').style.display = 'block';
+} else {
+    document.getElementById('startScreen').style.display = 'block';
+    connectMQTT();
+}
+
+// ===== MQTT =====
 function connectMQTT() {
     setStatus(false, 'Conectando...');
-    
     client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
         keepalive: 60,
         clean: true,
@@ -146,91 +221,60 @@ function connectMQTT() {
         reconnectPeriod: 3000,
         clientId: 'web_' + myId
     });
-    
+
     client.on('connect', function() {
         connected = true;
-        setStatus(true, 'Conectado ao ESP32');
+        setStatus(true, 'Conectado');
         client.subscribe(TOPIC_STATUS);
         client.subscribe(TOPIC_SESSION);
     });
 
     client.on('message', function(topic, message) {
         const msg = message.toString();
-        
         if (topic === TOPIC_STATUS) {
-            try {
-                states = JSON.parse(msg);
-                updateUI();
-            } catch(e) {}
+            try { states = JSON.parse(msg); updateUI(); } catch(e) {}
         }
-        
         if (topic === TOPIC_SESSION) {
-            try {
-                const data = JSON.parse(msg);
-                handleSessionMsg(data);
-            } catch(e) {}
+            try { handleSessionMsg(JSON.parse(msg)); } catch(e) {}
         }
     });
 
-    client.on('reconnect', function() {
-        setStatus(false, 'Reconectando...');
-    });
-
-    client.on('offline', function() {
-        connected = false;
-        setStatus(false, 'Sem conexão');
-    });
-
-    client.on('error', function(err) {
-        connected = false;
-        setStatus(false, 'Erro: ' + err.message);
-    });
+    client.on('reconnect', function() { setStatus(false, 'Reconectando...'); });
+    client.on('offline', function() { connected = false; setStatus(false, 'Offline'); });
+    client.on('error', function(e) { connected = false; setStatus(false, 'Erro'); });
 }
 
 // ===== SESSÃO =====
 function startSession() {
-    if (!connected) { alert('Aguarde a conexão...'); return; }
-    
-    // Verificar se alguém está usando
+    if (!connected) { alert('Aguarde a conexão com o ESP32...'); return; }
     if (sessionOwner && sessionOwner !== myId) {
         showScreen('wait');
-        // Esperar e tentar de novo
         setTimeout(startSession, 3000);
         return;
     }
-    
-    // Iniciar minha sessão
     sessionOwner = myId;
     inSession = true;
     countdown = SESSION_TIME;
-    
     client.publish(TOPIC_SESSION, JSON.stringify({ owner: myId, action: 'start' }));
-    
     showScreen('control');
-    document.getElementById('timerBox').style.display = 'block';
-    
-    // Timer
+
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(function() {
         countdown--;
         document.getElementById('countdown').textContent = countdown;
-        if (countdown <= 0) {
-            endSession();
-        }
+        // Update ring
+        const offset = ((SESSION_TIME - countdown) / SESSION_TIME) * 251.2;
+        document.getElementById('timerRing').style.strokeDashoffset = offset;
+        if (countdown <= 0) endSession();
     }, 1000);
 }
 
 function endSession() {
     inSession = false;
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    
-    // Desligar tudo
     sendCmd('ALLOFF');
-    
-    // Avisar que sessão acabou
     client.publish(TOPIC_SESSION, JSON.stringify({ owner: myId, action: 'end' }));
     sessionOwner = null;
-    
     showScreen('expired');
 }
 
@@ -249,16 +293,8 @@ function handleSessionMsg(data) {
 function toggle(device) {
     if (!inSession) return;
     const key = device.toLowerCase();
-    // Mapear corretamente
-    let stateKey = key;
-    if (key === 'led1') stateKey = 'led1';
-    if (key === 'led2') stateKey = 'led2';
-    if (key === 'led3') stateKey = 'led3';
-    if (key === 'rele') stateKey = 'rele';
-    
-    const isOn = states[stateKey];
-    const cmd = device + (isOn ? 'OFF' : 'ON');
-    sendCmd(cmd);
+    const isOn = states[key];
+    sendCmd(device + (isOn ? 'OFF' : 'ON'));
 }
 
 function sendCmd(cmd) {
@@ -272,13 +308,17 @@ function updateUI() {
     document.getElementById('l2').classList.toggle('on', states.led2);
     document.getElementById('l3').classList.toggle('on', states.led3);
     document.getElementById('releCard').classList.toggle('on', states.rele);
+    document.getElementById('releStatus').textContent = states.rele ? 'ON' : 'OFF';
 }
 
 function showScreen(name) {
-    document.getElementById('startScreen').style.display = name === 'start' ? 'block' : 'none';
-    document.getElementById('waitScreen').style.display = name === 'wait' ? 'block' : 'none';
-    document.getElementById('controlScreen').style.display = name === 'control' ? 'block' : 'none';
-    document.getElementById('expiredScreen').style.display = name === 'expired' ? 'block' : 'none';
+    ['startScreen','waitScreen','controlScreen','expiredScreen','deniedScreen'].forEach(id => {
+        document.getElementById(id).style.display = 'none';
+    });
+    document.getElementById(name + 'Screen').style.display = name === 'control' ? 'block' : 'block';
+    // fix id mapping
+    const map = { start:'startScreen', wait:'waitScreen', control:'controlScreen', expired:'expiredScreen', denied:'deniedScreen' };
+    if (map[name]) document.getElementById(map[name]).style.display = 'block';
 }
 
 function setStatus(ok, text) {
@@ -286,9 +326,6 @@ function setStatus(ok, text) {
     bar.classList.toggle('ok', ok);
     document.getElementById('statusText').textContent = text;
 }
-
-// ===== INICIAR =====
-connectMQTT();
 </script>
 </body>
 </html>
