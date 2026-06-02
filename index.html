@@ -3,328 +3,435 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Solar Control - Feira de Ciências</title>
+<title>Solar Control - Automação Residencial</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#0c1222 0%,#1a1a3e 50%,#0f172a 100%);color:#f1f5f9;min-height:100vh;padding:1rem;display:flex;justify-content:center;align-items:flex-start}
-.c{max-width:480px;width:100%;padding-top:.5rem}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#080d1a;color:#f1f5f9;min-height:100vh;padding:0}
+.app{max-width:480px;margin:0 auto;padding:1rem;min-height:100vh;position:relative;overflow:hidden}
+
+/* Bg effect */
+.app::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 30% 20%,rgba(245,158,11,.04) 0%,transparent 50%),radial-gradient(circle at 70% 80%,rgba(59,130,246,.03) 0%,transparent 50%);pointer-events:none;z-index:0}
+.app>*{position:relative;z-index:1}
 
 /* Header */
-.header{text-align:center;margin-bottom:1.5rem}
-.header .logo{font-size:3rem;margin-bottom:.3rem;display:block}
-.header h1{font-size:1.6rem;font-weight:800;background:linear-gradient(90deg,#f59e0b,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.header .sub{color:#64748b;font-size:.8rem;margin-top:.3rem;letter-spacing:.5px}
+.header{text-align:center;padding:1.5rem 0 1rem}
+.header .logo-wrap{width:60px;height:60px;margin:0 auto .8rem;background:linear-gradient(135deg,#f59e0b,#f97316);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;box-shadow:0 8px 25px rgba(245,158,11,.25)}
+.header h1{font-size:1.5rem;font-weight:800;letter-spacing:-.5px}
+.header .sub{color:#475569;font-size:.72rem;margin-top:.3rem;text-transform:uppercase;letter-spacing:2px}
 
-/* Status */
-.status-bar{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.6rem 1rem;border-radius:50px;margin:0 auto 1.5rem;font-size:.8rem;font-weight:600;width:fit-content;background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.2)}
-.status-bar.ok{background:rgba(16,185,129,.1);color:#10b981;border-color:rgba(16,185,129,.2)}
-.dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:p 2s infinite}
-@keyframes p{0%,100%{opacity:1}50%{opacity:.2}}
+/* Status pill */
+.pill{display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.45rem .9rem;border-radius:50px;margin:0 auto 1.2rem;font-size:.75rem;font-weight:600;width:fit-content;background:rgba(239,68,68,.08);color:#ef4444;border:1px solid rgba(239,68,68,.15)}
+.pill.ok{background:rgba(16,185,129,.08);color:#10b981;border-color:rgba(16,185,129,.15)}
+.pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* Tabs */
+.tabs{display:flex;gap:.3rem;margin-bottom:1.2rem;background:rgba(15,23,42,.5);border-radius:12px;padding:.3rem}
+.tab{flex:1;padding:.55rem;border-radius:10px;border:none;font-size:.75rem;font-weight:600;cursor:pointer;color:#64748b;background:transparent;transition:all .2s}
+.tab.active{background:rgba(245,158,11,.12);color:#f59e0b}
 
 /* Cards */
-.card{background:rgba(30,41,59,.7);backdrop-filter:blur(10px);border-radius:20px;padding:1.5rem;margin-bottom:1.2rem;border:1px solid rgba(51,65,85,.5)}
+.card{background:rgba(20,30,50,.6);backdrop-filter:blur(12px);border-radius:18px;padding:1.3rem;margin-bottom:1rem;border:1px solid rgba(51,65,85,.3)}
 
-/* Timer */
-.timer{text-align:center;padding:1.2rem}
-.timer .ring{width:90px;height:90px;margin:0 auto .8rem;position:relative;display:flex;align-items:center;justify-content:center}
-.timer .ring svg{position:absolute;transform:rotate(-90deg)}
-.timer .ring circle{fill:none;stroke-width:4}
-.timer .ring .bg{stroke:#1e293b}
-.timer .ring .progress{stroke:#f59e0b;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
-.timer .time{font-size:1.8rem;font-weight:800;color:#f59e0b}
-.timer .label{font-size:.75rem;color:#64748b;margin-top:.3rem}
+/* Energy Section */
+.energy-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1rem}
+.energy-card{background:rgba(15,23,42,.5);border-radius:14px;padding:1rem;border:1px solid rgba(51,65,85,.3)}
+.energy-card .label{font-size:.65rem;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:.3rem}
+.energy-card .value{font-size:1.4rem;font-weight:800}
+.energy-card .unit{font-size:.7rem;color:#64748b;font-weight:400}
+.energy-card.solar .value{color:#f59e0b}
+.energy-card.consumption .value{color:#3b82f6}
+.energy-card.savings .value{color:#10b981}
+.energy-card.cost .value{color:#a78bfa}
 
-/* LED Grid */
-.section-title{font-size:.75rem;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.8rem;font-weight:600}
-.led-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin-bottom:1.2rem}
-.led{background:rgba(15,23,42,.6);border-radius:16px;padding:1.2rem .5rem;text-align:center;border:2px solid rgba(51,65,85,.5);cursor:pointer;transition:all .3s;user-select:none;-webkit-tap-highlight-color:transparent}
-.led:active{transform:scale(.92)}
-.led.on{border-color:#f59e0b;box-shadow:0 0 25px rgba(245,158,11,.12),inset 0 0 20px rgba(245,158,11,.05);background:rgba(245,158,11,.06)}
-.led .icon{font-size:2rem;filter:grayscale(1) opacity(.25);transition:.3s}
-.led.on .icon{filter:none;text-shadow:0 0 15px rgba(245,158,11,.5)}
-.led .name{font-weight:700;margin-top:.4rem;font-size:.8rem}
-.led .sub-text{font-size:.65rem;color:#475569;margin-top:.1rem}
+/* Mini chart */
+.mini-chart{height:40px;display:flex;align-items:flex-end;gap:2px;margin-top:.5rem}
+.mini-chart .bar{flex:1;background:rgba(245,158,11,.3);border-radius:3px 3px 0 0;transition:height .5s}
+
+/* Timer box */
+.timer-display{text-align:center;padding:.8rem}
+.timer-display .time-big{font-size:2.2rem;font-weight:800;color:#f59e0b;font-variant-numeric:tabular-nums}
+.timer-display .label{font-size:.7rem;color:#64748b;margin-top:.2rem}
+.timer-ring-wrap{width:80px;height:80px;margin:0 auto .5rem;position:relative;display:flex;align-items:center;justify-content:center}
+.timer-ring-wrap svg{position:absolute;transform:rotate(-90deg)}
+.timer-ring-wrap circle{fill:none;stroke-width:3.5}
+.timer-ring-wrap .bg{stroke:rgba(30,41,59,.8)}
+.timer-ring-wrap .prog{stroke:#f59e0b;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+
+/* LED Section */
+.section-label{font-size:.7rem;color:#64748b;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.7rem;font-weight:700}
+.led-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.6rem;margin-bottom:1rem}
+.led-item{background:rgba(15,23,42,.5);border-radius:14px;padding:1rem .4rem;text-align:center;border:2px solid rgba(51,65,85,.3);cursor:pointer;transition:all .25s;user-select:none;-webkit-tap-highlight-color:transparent}
+.led-item:active{transform:scale(.9)}
+.led-item.on{border-color:rgba(245,158,11,.6);background:rgba(245,158,11,.06);box-shadow:0 0 20px rgba(245,158,11,.08)}
+.led-item .bulb{font-size:1.8rem;filter:grayscale(1) opacity(.2);transition:.3s}
+.led-item.on .bulb{filter:none}
+.led-item .lbl{font-size:.72rem;font-weight:700;margin-top:.3rem}
+.led-item .sub{font-size:.6rem;color:#475569}
 
 /* Rele */
-.rele{background:rgba(15,23,42,.6);border-radius:16px;padding:1.3rem;text-align:center;border:2px solid rgba(51,65,85,.5);cursor:pointer;transition:all .3s;user-select:none;-webkit-tap-highlight-color:transparent;display:flex;align-items:center;gap:1rem}
-.rele:active{transform:scale(.97)}
-.rele.on{border-color:#ef4444;box-shadow:0 0 25px rgba(239,68,68,.1);background:rgba(239,68,68,.04)}
-.rele .icon{font-size:2.5rem;filter:grayscale(1) opacity(.25);transition:.3s}
-.rele.on .icon{filter:none}
-.rele-info{text-align:left}
-.rele .name{font-weight:700;font-size:1rem}
-.rele .desc{font-size:.7rem;color:#64748b;margin-top:.15rem}
-.rele-status{margin-left:auto;font-size:.7rem;padding:.3rem .7rem;border-radius:50px;background:rgba(51,65,85,.5);color:#64748b;font-weight:600}
-.rele.on .rele-status{background:rgba(239,68,68,.15);color:#ef4444}
+.rele-row{display:flex;align-items:center;background:rgba(15,23,42,.5);border-radius:14px;padding:1rem 1.2rem;border:2px solid rgba(51,65,85,.3);cursor:pointer;transition:all .25s;margin-bottom:1rem;gap:1rem;user-select:none;-webkit-tap-highlight-color:transparent}
+.rele-row:active{transform:scale(.97)}
+.rele-row.on{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.04)}
+.rele-row .bulb{font-size:2rem;filter:grayscale(1) opacity(.2);transition:.3s}
+.rele-row.on .bulb{filter:none}
+.rele-row .info{flex:1}
+.rele-row .info .name{font-weight:700;font-size:.9rem}
+.rele-row .info .desc{font-size:.65rem;color:#64748b;margin-top:.1rem}
+.rele-badge{font-size:.65rem;padding:.25rem .6rem;border-radius:50px;background:rgba(51,65,85,.4);color:#64748b;font-weight:700}
+.rele-row.on .rele-badge{background:rgba(239,68,68,.12);color:#ef4444}
 
 /* Buttons */
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
-.btn{padding:.8rem;border-radius:12px;border:none;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s}
-.btn:active{transform:scale(.95)}
-.btn-on{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;box-shadow:0 4px 15px rgba(245,158,11,.2)}
-.btn-off{background:rgba(51,65,85,.5);color:#94a3b8}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.5rem}
+.btn{padding:.7rem;border-radius:11px;border:none;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .15s}
+.btn:active{transform:scale(.94)}
+.btn-on{background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;box-shadow:0 3px 12px rgba(245,158,11,.2)}
+.btn-off{background:rgba(51,65,85,.4);color:#94a3b8}
 
-/* Start Screen */
-.start-screen{text-align:center;padding:1.5rem 0}
-.start-screen .hero-icon{font-size:4rem;margin-bottom:1rem;display:block}
-.start-screen p{color:#94a3b8;margin-bottom:1.5rem;line-height:1.7;font-size:.9rem}
-.start-screen .btn-start{display:inline-block;padding:1rem 2.5rem;border-radius:14px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:800;font-size:1.1rem;cursor:pointer;box-shadow:0 5px 20px rgba(245,158,11,.3);transition:all .2s}
-.start-screen .btn-start:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(245,158,11,.4)}
-.start-screen .btn-start:active{transform:scale(.96)}
-.features{margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem .8rem;text-align:left}
-.features div{font-size:.8rem;color:#64748b;padding:.4rem 0}
-.features span{margin-right:.4rem}
+/* Scheduler */
+.sched-card{background:rgba(15,23,42,.4);border-radius:12px;padding:.9rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.8rem;border:1px solid rgba(51,65,85,.2)}
+.sched-card .time{font-size:1.1rem;font-weight:800;color:#f1f5f9;min-width:55px}
+.sched-card .detail{flex:1}
+.sched-card .detail .action{font-size:.78rem;font-weight:600}
+.sched-card .detail .days{font-size:.65rem;color:#64748b;margin-top:.15rem}
+.sched-toggle{width:38px;height:22px;border-radius:22px;background:#1e293b;position:relative;cursor:pointer;transition:.3s;border:1px solid #334155}
+.sched-toggle.on{background:#f59e0b;border-color:#f59e0b}
+.sched-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.3s}
+.sched-toggle.on::after{left:18px}
 
-/* Wait Screen */
-.wait{text-align:center;padding:2.5rem 1rem}
-.wait h2{font-size:1.4rem;margin-bottom:.8rem}
-.wait p{color:#94a3b8;line-height:1.6;font-size:.9rem}
-.wait .spinner{width:40px;height:40px;border:3px solid #1e293b;border-top-color:#f59e0b;border-radius:50%;animation:spin 1s linear infinite;margin:1.5rem auto}
+/* Routine */
+.routine-card{background:rgba(15,23,42,.4);border-radius:12px;padding:.9rem;margin-bottom:.6rem;display:flex;align-items:center;gap:.8rem;border:1px solid rgba(51,65,85,.2);cursor:pointer;transition:all .2s}
+.routine-card:active{transform:scale(.97)}
+.routine-card .icon{font-size:1.5rem}
+.routine-card .info{flex:1}
+.routine-card .info .name{font-size:.82rem;font-weight:700}
+.routine-card .info .desc{font-size:.65rem;color:#64748b;margin-top:.1rem}
+.routine-card .arrow{color:#475569;font-size:1rem}
+.routine-card.running{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.04)}
+.routine-card.running .badge{font-size:.6rem;background:rgba(16,185,129,.15);color:#10b981;padding:.2rem .5rem;border-radius:50px;margin-left:auto;font-weight:600}
+
+/* Screens */
+.screen{display:none}
+.screen.visible{display:block}
+
+/* Start */
+.start-content{text-align:center;padding:2rem 0}
+.start-content .hero{font-size:4.5rem;margin-bottom:1rem;display:block}
+.start-content h2{font-size:1.3rem;font-weight:800;margin-bottom:.5rem}
+.start-content p{color:#94a3b8;font-size:.88rem;line-height:1.7;margin-bottom:1.8rem}
+.start-btn{display:inline-block;padding:1rem 2.5rem;border-radius:14px;border:none;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:800;font-size:1.1rem;cursor:pointer;box-shadow:0 6px 25px rgba(245,158,11,.3);transition:all .2s}
+.start-btn:active{transform:scale(.95)}
+.start-features{margin-top:2rem;display:grid;grid-template-columns:1fr 1fr;gap:.4rem .6rem}
+.start-features div{font-size:.78rem;color:#64748b;padding:.3rem 0}
+
+/* Wait */
+.wait-content{text-align:center;padding:3rem 0}
+.wait-content h2{font-size:1.3rem;margin-bottom:.8rem}
+.wait-content p{color:#94a3b8;font-size:.88rem;line-height:1.7}
+.spinner{width:36px;height:36px;border:3px solid #1e293b;border-top-color:#f59e0b;border-radius:50%;animation:spin .8s linear infinite;margin:1.5rem auto}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* Expired */
-.expired{text-align:center;padding:2.5rem 1rem}
-.expired .icon{font-size:3.5rem;margin-bottom:1rem;display:block}
-.expired h2{font-size:1.4rem;margin-bottom:.8rem}
-.expired p{color:#94a3b8;line-height:1.7;font-size:.9rem}
+.exp-content{text-align:center;padding:3rem 0}
+.exp-content .icon{font-size:3.5rem;display:block;margin-bottom:1rem}
+.exp-content h2{font-size:1.3rem;margin-bottom:.7rem}
+.exp-content p{color:#94a3b8;font-size:.88rem;line-height:1.7}
 
 /* Denied */
-.denied{text-align:center;padding:2.5rem 1rem}
-.denied .icon{font-size:3.5rem;margin-bottom:1rem;display:block}
-.denied h2{font-size:1.3rem;margin-bottom:.8rem;color:#ef4444}
-.denied p{color:#94a3b8;line-height:1.7;font-size:.9rem}
+.denied-content{text-align:center;padding:3rem 0}
+.denied-content .icon{font-size:3.5rem;display:block;margin-bottom:1rem}
+.denied-content h2{font-size:1.3rem;margin-bottom:.7rem;color:#ef4444}
+.denied-content p{color:#94a3b8;font-size:.88rem;line-height:1.7}
 
-/* Footer */
-.footer{text-align:center;padding:1rem 0;font-size:.7rem;color:#334155}
+.footer{text-align:center;padding:1.5rem 0 .5rem;font-size:.65rem;color:#1e293b}
 </style>
 </head>
 <body>
-<div class="c">
+<div class="app">
 
 <div class="header">
-<span class="logo">☀️</span>
+<div class="logo-wrap">☀️</div>
 <h1>Solar Control</h1>
-<div class="sub">FEIRA DE CIÊNCIAS • ENERGIA SOLAR</div>
+<div class="sub">Automação Residencial • Energia Solar</div>
 </div>
 
-<div class="status-bar" id="statusBar">
-<span class="dot"></span>
-<span id="statusText">Conectando...</span>
-</div>
+<div class="pill" id="statusBar"><span class="dot"></span><span id="statusText">Conectando...</span></div>
 
-<!-- Acesso negado (sem token) -->
-<div id="deniedScreen" class="denied" style="display:none">
+<!-- DENIED -->
+<div class="screen" id="deniedScreen">
+<div class="denied-content">
 <span class="icon">🔒</span>
 <h2>Acesso Restrito</h2>
-<p>Para usar a demonstração, escaneie o QR Code disponível no stand da feira.</p>
-</div>
-
-<!-- Tela inicial (com token válido) -->
-<div id="startScreen" class="start-screen" style="display:none">
-<span class="hero-icon">⚡</span>
-<p>Controle luzes reais em tempo real!<br>Você terá <strong>1 minuto</strong> para testar.</p>
-<button class="btn-start" onclick="startSession()">▶️ Começar Demonstração</button>
-<div class="features">
-<div><span>💡</span> 3 LEDs</div>
-<div><span>🔌</span> Lâmpada real</div>
-<div><span>⏱️</span> 60 segundos</div>
-<div><span>📱</span> Tempo real</div>
+<p>Para usar a demonstração, escaneie o<br>QR Code disponível no stand da feira.</p>
 </div>
 </div>
 
-<!-- Espera -->
-<div id="waitScreen" class="wait" style="display:none">
+<!-- START -->
+<div class="screen" id="startScreen">
+<div class="start-content">
+<span class="hero">⚡</span>
+<h2>Bem-vindo!</h2>
+<p>Controle luzes reais em tempo real<br>direto do seu celular.</p>
+<button class="start-btn" onclick="startSession()">Iniciar Demonstração</button>
+<div class="start-features">
+<div>💡 3 LEDs</div>
+<div>🔌 Lâmpada real</div>
+<div>⏱️ 60 segundos</div>
+<div>📊 Gasto simulado</div>
+</div>
+</div>
+</div>
+
+<!-- WAIT -->
+<div class="screen" id="waitScreen">
+<div class="wait-content">
 <h2>⏳ Aguarde sua vez</h2>
-<p>Alguém está usando agora.<br>Você entrará automaticamente.</p>
+<p>Alguém está usando a demonstração.<br>Você entrará automaticamente.</p>
 <div class="spinner"></div>
 </div>
+</div>
 
-<!-- Controle -->
-<div id="controlScreen" style="display:none">
-<div class="card timer" id="timerBox">
-<div class="ring">
-<svg width="90" height="90"><circle class="bg" cx="45" cy="45" r="40"/><circle class="progress" id="timerRing" cx="45" cy="45" r="40" stroke-dasharray="251.2" stroke-dashoffset="0"/></svg>
-<span class="time" id="countdown">60</span>
+<!-- CONTROL -->
+<div class="screen" id="controlScreen">
+
+<!-- Timer -->
+<div class="card" style="padding:1rem">
+<div class="timer-display">
+<div class="timer-ring-wrap">
+<svg width="80" height="80"><circle class="bg" cx="40" cy="40" r="35"/><circle class="prog" id="timerRing" cx="40" cy="40" r="35" stroke-dasharray="219.9" stroke-dashoffset="0"/></svg>
+<span class="time-big" id="countdown">60</span>
 </div>
 <div class="label">segundos restantes</div>
 </div>
-
-<div class="section-title">💡 LEDs de Demonstração</div>
-<div class="led-grid">
-<div class="led" id="l1" onclick="toggle('LED1')"><div class="icon">💡</div><div class="name">Sala</div><div class="sub-text">GPIO 4</div></div>
-<div class="led" id="l2" onclick="toggle('LED2')"><div class="icon">💡</div><div class="name">Cozinha</div><div class="sub-text">GPIO 5</div></div>
-<div class="led" id="l3" onclick="toggle('LED3')"><div class="icon">💡</div><div class="name">Quarto</div><div class="sub-text">GPIO 21</div></div>
 </div>
 
-<div class="section-title">🔌 Lâmpada Real (Relé)</div>
-<div class="rele" id="releCard" onclick="toggle('RELE')">
-<div class="icon">💡</div>
-<div class="rele-info"><div class="name">Lâmpada</div><div class="desc">Controle real via relé</div></div>
-<div class="rele-status" id="releStatus">OFF</div>
+<!-- Tabs -->
+<div class="tabs">
+<button class="tab active" onclick="switchTab('devices')">Dispositivos</button>
+<button class="tab" onclick="switchTab('energy')">Energia</button>
+<button class="tab" onclick="switchTab('schedule')">Rotinas</button>
 </div>
 
-<div class="btns">
-<button class="btn btn-on" onclick="sendCmd('ALLON')">🔆 Ligar Tudo</button>
+<!-- TAB: Devices -->
+<div id="tabDevices">
+<div class="section-label">💡 Iluminação</div>
+<div class="led-row">
+<div class="led-item" id="l1" onclick="toggle('LED1')"><div class="bulb">💡</div><div class="lbl">Sala</div><div class="sub">LED 1</div></div>
+<div class="led-item" id="l2" onclick="toggle('LED2')"><div class="bulb">💡</div><div class="lbl">Cozinha</div><div class="sub">LED 2</div></div>
+<div class="led-item" id="l3" onclick="toggle('LED3')"><div class="bulb">💡</div><div class="lbl">Quarto</div><div class="sub">LED 3</div></div>
+</div>
+
+<div class="section-label">🔌 Relé</div>
+<div class="rele-row" id="releCard" onclick="toggle('RELE')">
+<div class="bulb">💡</div>
+<div class="info"><div class="name">Lâmpada Real</div><div class="desc">Controle 110/220V via relé</div></div>
+<div class="rele-badge" id="releStatus">OFF</div>
+</div>
+
+<div class="btn-row">
+<button class="btn btn-on" onclick="sendCmd('ALLON')">Ligar Tudo</button>
 <button class="btn btn-off" onclick="sendCmd('ALLOFF')">Desligar Tudo</button>
 </div>
 </div>
 
-<!-- Expirado -->
-<div id="expiredScreen" style="display:none" class="expired">
-<span class="icon">⏰</span>
-<h2>Tempo esgotado!</h2>
-<p>Sua sessão de 1 minuto terminou.<br>Obrigado por participar da demonstração!<br><br>🌱 Energia solar é o futuro!</p>
+<!-- TAB: Energy -->
+<div id="tabEnergy" style="display:none">
+<div class="energy-grid">
+<div class="energy-card solar"><div class="label">Geração Solar</div><div class="value" id="enSolar">0<span class="unit"> W</span></div></div>
+<div class="energy-card consumption"><div class="label">Consumo Atual</div><div class="value" id="enConsumo">0<span class="unit"> W</span></div></div>
+<div class="energy-card savings"><div class="label">Economia</div><div class="value" id="enEconomia">R$ 0<span class="unit">/mês</span></div></div>
+<div class="energy-card cost"><div class="label">Custo Evitado</div><div class="value" id="enCusto">0<span class="unit"> kWh</span></div></div>
+</div>
+<div class="card" style="padding:1rem">
+<div class="section-label">📊 Geração Hoje</div>
+<div class="mini-chart" id="miniChart"></div>
+</div>
 </div>
 
-<div class="footer">Projeto Feira de Ciências 2026 • ESP32 + MQTT</div>
+<!-- TAB: Schedule -->
+<div id="tabSchedule" style="display:none">
+<div class="section-label">⏰ Temporizadores</div>
+<div class="sched-card">
+<div class="time">06:30</div>
+<div class="detail"><div class="action">Ligar Sala</div><div class="days">Seg, Ter, Qua, Qui, Sex</div></div>
+<div class="sched-toggle on" onclick="this.classList.toggle('on')"></div>
+</div>
+<div class="sched-card">
+<div class="time">22:00</div>
+<div class="detail"><div class="action">Desligar Tudo</div><div class="days">Todos os dias</div></div>
+<div class="sched-toggle on" onclick="this.classList.toggle('on')"></div>
+</div>
+<div class="sched-card">
+<div class="time">18:30</div>
+<div class="detail"><div class="action">Ligar Lâmpada</div><div class="days">Seg a Sex</div></div>
+<div class="sched-toggle" onclick="this.classList.toggle('on')"></div>
+</div>
+
+<div class="section-label" style="margin-top:1.2rem">🔄 Rotinas</div>
+<div class="routine-card" onclick="runRoutine(this,'Chegando em casa')">
+<div class="icon">🏠</div>
+<div class="info"><div class="name">Chegando em Casa</div><div class="desc">Liga sala + cozinha + lâmpada</div></div>
+<div class="arrow">›</div>
+</div>
+<div class="routine-card" onclick="runRoutine(this,'Boa noite')">
+<div class="icon">🌙</div>
+<div class="info"><div class="name">Boa Noite</div><div class="desc">Desliga tudo, liga quarto por 15min</div></div>
+<div class="arrow">›</div>
+</div>
+<div class="routine-card" onclick="runRoutine(this,'Economia')">
+<div class="icon">💰</div>
+<div class="info"><div class="name">Modo Economia</div><div class="desc">Desliga tudo exceto essenciais</div></div>
+<div class="arrow">›</div>
+</div>
+</div>
+
+</div>
+
+<!-- EXPIRED -->
+<div class="screen" id="expiredScreen">
+<div class="exp-content">
+<span class="icon">⏰</span>
+<h2>Tempo Esgotado!</h2>
+<p>Sua demonstração de 1 minuto terminou.<br>Obrigado por participar!<br><br>🌱 Energia solar é o futuro!</p>
+</div>
+</div>
+
+<div class="footer">Feira de Ciências 2026 • ESP32 + MQTT + Solar</div>
 </div>
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
 // ===== CONFIG =====
-const TOPIC_CMD = 'feira_solar_2026/cmd';
-const TOPIC_STATUS = 'feira_solar_2026/status';
-const TOPIC_SESSION = 'feira_solar_2026/session';
-const SESSION_TIME = 60;
-const VALID_TOKEN = 'feira2026';  // Token secreto no QR code
+const TOPIC_CMD='feira_solar_2026/cmd',TOPIC_STATUS='feira_solar_2026/status',TOPIC_SESSION='feira_solar_2026/session';
+const SESSION_TIME=60,VALID_TOKEN='feira2026';
+const params=new URLSearchParams(window.location.search);
+const hasAccess=(params.get('t')===VALID_TOKEN);
 
-// ===== VERIFICAR TOKEN =====
-const params = new URLSearchParams(window.location.search);
-const token = params.get('t');
-const hasAccess = (token === VALID_TOKEN);
+let client=null,connected=false;
+let states={led1:false,led2:false,led3:false,rele:false};
+let sessionOwner=null,myId='u_'+Math.random().toString(36).substr(2,6);
+let countdown=SESSION_TIME,timerInterval=null,inSession=false;
 
-// ===== STATE =====
-let client = null;
-let connected = false;
-let states = { led1: false, led2: false, led3: false, rele: false };
-let sessionOwner = null;
-let myId = 'user_' + Math.random().toString(36).substr(2, 8);
-let countdown = SESSION_TIME;
-let timerInterval = null;
-let inSession = false;
+// Energy simulation
+let simSolar=0,simConsumo=0,simEconomia=0,simKwh=0;
 
 // ===== INIT =====
-if (!hasAccess) {
-    document.getElementById('deniedScreen').style.display = 'block';
-} else {
-    document.getElementById('startScreen').style.display = 'block';
-    connectMQTT();
-}
+if(!hasAccess){show('denied');}else{show('start');connectMQTT();}
 
 // ===== MQTT =====
-function connectMQTT() {
-    setStatus(false, 'Conectando...');
-    client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
-        keepalive: 60,
-        clean: true,
-        connectTimeout: 10000,
-        reconnectPeriod: 3000,
-        clientId: 'web_' + myId
-    });
-
-    client.on('connect', function() {
-        connected = true;
-        setStatus(true, 'Conectado');
-        client.subscribe(TOPIC_STATUS);
-        client.subscribe(TOPIC_SESSION);
-    });
-
-    client.on('message', function(topic, message) {
-        const msg = message.toString();
-        if (topic === TOPIC_STATUS) {
-            try { states = JSON.parse(msg); updateUI(); } catch(e) {}
-        }
-        if (topic === TOPIC_SESSION) {
-            try { handleSessionMsg(JSON.parse(msg)); } catch(e) {}
-        }
-    });
-
-    client.on('reconnect', function() { setStatus(false, 'Reconectando...'); });
-    client.on('offline', function() { connected = false; setStatus(false, 'Offline'); });
-    client.on('error', function(e) { connected = false; setStatus(false, 'Erro'); });
+function connectMQTT(){
+setStatus(false,'Conectando...');
+client=mqtt.connect('wss://broker.emqx.io:8084/mqtt',{keepalive:60,clean:true,connectTimeout:10000,reconnectPeriod:3000,clientId:'web_'+myId});
+client.on('connect',()=>{connected=true;setStatus(true,'Conectado');client.subscribe(TOPIC_STATUS);client.subscribe(TOPIC_SESSION);});
+client.on('message',(t,m)=>{const msg=m.toString();if(t===TOPIC_STATUS){try{states=JSON.parse(msg);updateUI();updateEnergy();}catch(e){}}if(t===TOPIC_SESSION){try{handleSession(JSON.parse(msg));}catch(e){}}});
+client.on('reconnect',()=>setStatus(false,'Reconectando...'));
+client.on('offline',()=>{connected=false;setStatus(false,'Offline');});
+client.on('error',()=>{connected=false;setStatus(false,'Erro');});
 }
 
-// ===== SESSÃO =====
-function startSession() {
-    if (!connected) { alert('Aguarde a conexão com o ESP32...'); return; }
-    if (sessionOwner && sessionOwner !== myId) {
-        showScreen('wait');
-        setTimeout(startSession, 3000);
-        return;
-    }
-    sessionOwner = myId;
-    inSession = true;
-    countdown = SESSION_TIME;
-    client.publish(TOPIC_SESSION, JSON.stringify({ owner: myId, action: 'start' }));
-    showScreen('control');
-
-    if (timerInterval) clearInterval(timerInterval);
-    timerInterval = setInterval(function() {
-        countdown--;
-        document.getElementById('countdown').textContent = countdown;
-        // Update ring
-        const offset = ((SESSION_TIME - countdown) / SESSION_TIME) * 251.2;
-        document.getElementById('timerRing').style.strokeDashoffset = offset;
-        if (countdown <= 0) endSession();
-    }, 1000);
+// ===== SESSION =====
+function startSession(){
+if(!connected){alert('Aguarde a conexão...');return;}
+if(sessionOwner&&sessionOwner!==myId){show('wait');setTimeout(startSession,3000);return;}
+sessionOwner=myId;inSession=true;countdown=SESSION_TIME;
+client.publish(TOPIC_SESSION,JSON.stringify({owner:myId,action:'start'}));
+show('control');
+if(timerInterval)clearInterval(timerInterval);
+timerInterval=setInterval(()=>{
+countdown--;
+document.getElementById('countdown').textContent=countdown;
+const off=((SESSION_TIME-countdown)/SESSION_TIME)*219.9;
+document.getElementById('timerRing').style.strokeDashoffset=off;
+if(countdown<=0)endSession();
+},1000);
+initChart();
+}
+function endSession(){
+inSession=false;
+if(timerInterval){clearInterval(timerInterval);timerInterval=null;}
+sendCmd('ALLOFF');
+client.publish(TOPIC_SESSION,JSON.stringify({owner:myId,action:'end'}));
+sessionOwner=null;show('expired');
+}
+function handleSession(d){
+if(d.action==='start'&&d.owner!==myId){sessionOwner=d.owner;if(!inSession)show('wait');}
+if(d.action==='end'){sessionOwner=null;if(!inSession)show('start');}
 }
 
-function endSession() {
-    inSession = false;
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    sendCmd('ALLOFF');
-    client.publish(TOPIC_SESSION, JSON.stringify({ owner: myId, action: 'end' }));
-    sessionOwner = null;
-    showScreen('expired');
-}
-
-function handleSessionMsg(data) {
-    if (data.action === 'start' && data.owner !== myId) {
-        sessionOwner = data.owner;
-        if (!inSession) showScreen('wait');
-    }
-    if (data.action === 'end') {
-        sessionOwner = null;
-        if (!inSession) showScreen('start');
-    }
-}
-
-// ===== COMANDOS =====
-function toggle(device) {
-    if (!inSession) return;
-    const key = device.toLowerCase();
-    const isOn = states[key];
-    sendCmd(device + (isOn ? 'OFF' : 'ON'));
-}
-
-function sendCmd(cmd) {
-    if (!connected) return;
-    client.publish(TOPIC_CMD, cmd);
-}
+// ===== COMMANDS =====
+function toggle(dev){if(!inSession)return;const k=dev.toLowerCase();sendCmd(dev+(states[k]?'OFF':'ON'));}
+function sendCmd(cmd){if(!connected)return;client.publish(TOPIC_CMD,cmd);}
 
 // ===== UI =====
-function updateUI() {
-    document.getElementById('l1').classList.toggle('on', states.led1);
-    document.getElementById('l2').classList.toggle('on', states.led2);
-    document.getElementById('l3').classList.toggle('on', states.led3);
-    document.getElementById('releCard').classList.toggle('on', states.rele);
-    document.getElementById('releStatus').textContent = states.rele ? 'ON' : 'OFF';
+function updateUI(){
+document.getElementById('l1').classList.toggle('on',states.led1);
+document.getElementById('l2').classList.toggle('on',states.led2);
+document.getElementById('l3').classList.toggle('on',states.led3);
+document.getElementById('releCard').classList.toggle('on',states.rele);
+document.getElementById('releStatus').textContent=states.rele?'ON':'OFF';
 }
 
-function showScreen(name) {
-    ['startScreen','waitScreen','controlScreen','expiredScreen','deniedScreen'].forEach(id => {
-        document.getElementById(id).style.display = 'none';
-    });
-    document.getElementById(name + 'Screen').style.display = name === 'control' ? 'block' : 'block';
-    // fix id mapping
-    const map = { start:'startScreen', wait:'waitScreen', control:'controlScreen', expired:'expiredScreen', denied:'deniedScreen' };
-    if (map[name]) document.getElementById(map[name]).style.display = 'block';
+function show(name){
+['start','wait','control','expired','denied'].forEach(s=>document.getElementById(s+'Screen').classList.remove('visible'));
+document.getElementById(name+'Screen').classList.add('visible');
 }
 
-function setStatus(ok, text) {
-    const bar = document.getElementById('statusBar');
-    bar.classList.toggle('ok', ok);
-    document.getElementById('statusText').textContent = text;
+function setStatus(ok,text){
+document.getElementById('statusBar').classList.toggle('ok',ok);
+document.getElementById('statusText').textContent=text;
+}
+
+// ===== TABS =====
+function switchTab(tab){
+document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+event.target.classList.add('active');
+document.getElementById('tabDevices').style.display=tab==='devices'?'block':'none';
+document.getElementById('tabEnergy').style.display=tab==='energy'?'block':'none';
+document.getElementById('tabSchedule').style.display=tab==='schedule'?'block':'none';
+}
+
+// ===== ENERGY SIMULATION =====
+function updateEnergy(){
+const onCount=[states.led1,states.led2,states.led3,states.rele].filter(Boolean).length;
+simConsumo=onCount*12;// 12W por dispositivo
+simSolar=28+Math.random()*8;// Simulação geração solar
+simEconomia=(simSolar*0.75*30*0.001*0.85).toFixed(1);// R$/mês estimado
+simKwh=(simSolar*0.001*8).toFixed(2);// kWh hoje
+
+document.getElementById('enSolar').innerHTML=simSolar.toFixed(0)+'<span class="unit"> W</span>';
+document.getElementById('enConsumo').innerHTML=simConsumo+'<span class="unit"> W</span>';
+document.getElementById('enEconomia').innerHTML='R$ '+simEconomia+'<span class="unit">/mês</span>';
+document.getElementById('enCusto').innerHTML=simKwh+'<span class="unit"> kWh</span>';
+}
+
+function initChart(){
+const c=document.getElementById('miniChart');
+c.innerHTML='';
+for(let i=0;i<24;i++){
+const h=20+Math.random()*70;
+const bar=document.createElement('div');
+bar.className='bar';
+bar.style.height=(i<6||i>19?10:h)+'%';
+bar.style.background=i<6||i>19?'rgba(51,65,85,.3)':'rgba(245,158,11,.4)';
+c.appendChild(bar);
+}
+}
+
+// ===== ROUTINES (visual only) =====
+function runRoutine(el,name){
+if(!inSession)return;
+el.classList.add('running');
+const badge=document.createElement('div');
+badge.className='badge';
+badge.textContent='Executando...';
+badge.style.cssText='font-size:.6rem;background:rgba(16,185,129,.15);color:#10b981;padding:.2rem .5rem;border-radius:50px;margin-left:auto;font-weight:600';
+el.querySelector('.arrow').replaceWith(badge);
+
+if(name==='Chegando em casa'){sendCmd('LED1ON');setTimeout(()=>sendCmd('LED2ON'),500);setTimeout(()=>sendCmd('RELEON'),1000);}
+else if(name==='Boa noite'){sendCmd('ALLOFF');setTimeout(()=>sendCmd('LED3ON'),800);}
+else if(name==='Economia'){sendCmd('ALLOFF');}
+
+setTimeout(()=>{badge.textContent='✓ Feito';badge.style.color='#10b981';},2000);
 }
 </script>
 </body>
